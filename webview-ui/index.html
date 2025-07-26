@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agentic Assistant</title>
+  <style>
+    body {
+      font-family: var(--vscode-font-family);
+      padding: 1em;
+      color: var(--vscode-foreground);
+      background-color: var(--vscode-editor-background);
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-bottom: 1em;
+      padding: 8px;
+      background-color: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border);
+      border-radius: 2px;
+    }
+    button {
+      background-color: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-bottom: 1em;
+    }
+    button:hover {
+      background-color: var(--vscode-button-hoverBackground);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    #log {
+      background-color: var(--vscode-editor-background);
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--vscode-panel-border);
+      border-radius: 2px;
+      font-family: var(--vscode-editor-font-family);
+      font-size: var(--vscode-editor-font-size);
+    }
+    .status-connecting { color: var(--vscode-charts-blue); }
+    .status-connected { color: var(--vscode-charts-green); }
+    .status-error { color: var(--vscode-errorForeground); }
+    .status-closed { color: var(--vscode-charts-orange); }
+  </style>
+</head>
+<body>
+  <h2>Agentic Assistant</h2>
+  <textarea id="story" placeholder="Enter your user story here (e.g., 'Create a todo list component with add/remove functionality')..."></textarea><br>
+  <button id="run">Run Agent</button>
+  <div id="log">
+    <p><em>Ready to execute user stories. Enter a story above and click "Run Agent".</em></p>
+    <p><em>Note: Make sure your agent server is running on ws://localhost:8000</em></p>
+  </div>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+    const runButton = document.getElementById('run');
+
+    runButton.addEventListener('click', () => {
+      const story = document.getElementById('story').value.trim();
+      if (story) {
+        runButton.disabled = true;
+        runButton.textContent = 'Running...';
+        
+        const logBox = document.getElementById('log');
+        logBox.innerHTML = `<p class="status-connecting"><strong>Sending user story to agent...</strong></p>`;
+        
+        vscode.postMessage({ command: 'startStory', story: story });
+        
+        // Re-enable button after 2 seconds to allow multiple runs
+        setTimeout(() => {
+          runButton.disabled = false;
+          runButton.textContent = 'Run Agent';
+        }, 2000);
+      } else {
+        alert('Please enter a user story first!');
+      }
+    });
+
+    window.addEventListener('message', event => {
+      const message = event.data;
+      if (message.command === 'log') {
+        const data = message.data;
+        const logBox = document.getElementById('log');
+        
+        // Format the log entry based on status
+        let statusClass = '';
+        if (data.status) {
+          statusClass = `status-${data.status.toLowerCase()}`;
+        }
+        
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `
+          <div class="${statusClass}">
+            <strong>[${timestamp}]</strong> 
+            ${data.message || JSON.stringify(data, null, 2)}
+          </div>
+        `;
+        
+        logBox.innerHTML += logEntry;
+        logBox.scrollTop = logBox.scrollHeight;
+      }
+    });
+  </script>
+  </script>
+</body>
+</html>
