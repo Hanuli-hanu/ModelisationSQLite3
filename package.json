@@ -10,8 +10,37 @@
   "categories": [
     "Other"
   ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "views": {
+      "agentic-sidebar": [
+        {
+          "id": "agentic.chatView",
+          "name": "Assistant Chat",
+          "type": "webview",
+          "icon": "$(robot)",
+          "when": "agentic:enabled"
+        },
+        {
+          "id": "agentic.historyView",
+          "name": "Task History",
+          "icon": "$(history)",
+          "when": "agentic:enabled"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "agentic-sidebar",
+          "title": "Agentic Assistant",
+          "icon": "resources/robot-icon.svg"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "agentic.start",
@@ -22,9 +51,53 @@
         "command": "agentic.stop",
         "title": "⏹️ Stop Agentic Assistant",
         "category": "Agentic"
+      },
+      {
+        "command": "agentic.openPanel",
+        "title": "Open Assistant Panel",
+        "icon": "$(play)"
+      },
+      {
+        "command": "agentic.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "agentic.clearHistory",
+        "title": "Clear History",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "agentic.showWebview",
+        "title": "Open Full Interface",
+        "icon": "$(window)"
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "agentic.refresh",
+          "when": "view == agentic.chatView",
+          "group": "navigation"
+        },
+        {
+          "command": "agentic.showWebview",
+          "when": "view == agentic.chatView",
+          "group": "navigation"
+        },
+        {
+          "command": "agentic.clearHistory",
+          "when": "view == agentic.historyView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "agentic.openPanel",
+          "when": "view == agentic.historyView && viewItem == startItem",
+          "group": "inline"
+        }
+      ],
       "explorer/context": [
         {
           "command": "agentic.start",
@@ -38,6 +111,18 @@
         },
         {
           "command": "agentic.stop"
+        },
+        {
+          "command": "agentic.openPanel",
+          "when": "false"
+        },
+        {
+          "command": "agentic.refresh",
+          "when": "false"
+        },
+        {
+          "command": "agentic.clearHistory",
+          "when": "false"
         }
       ]
     },
@@ -46,6 +131,11 @@
         "command": "agentic.start",
         "key": "ctrl+shift+a",
         "mac": "cmd+shift+a"
+      },
+      {
+        "command": "agentic.showWebview",
+        "key": "ctrl+shift+alt+a",
+        "mac": "cmd+shift+alt+a"
       }
     ],
     "configuration": {

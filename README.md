@@ -1,23 +1,24 @@
 # 🚀 Agentic VS Code Assistant
 
-An intelligent AI-powered VS Code extension that analyzes your project and implements user stories using advanced agent workflows. Features a modern, professional UI with real-time feedback and seamless file management.
+An intelligent AI-powered VS Code extension that integrates directly into the sidebar with a native-like interface. Features real-time agent visualization, task history, and seamless file management - just like Cody and other modern VS Code extensions.
 
 ## ✨ Key Features
 
-### 🎨 Enhanced UI/UX
-- **Modern Design**: Clean, professional interface that integrates seamlessly with VS Code themes
-- **Smooth Animations**: Elegant transitions and progress indicators for better user experience  
-- **Real-time Feedback**: Live status updates with animated progress bars and agent visualization
-- **Responsive Layout**: Optimized for different screen sizes and VS Code layouts
+### 🎨 Native Sidebar Integration
+- **Activity Bar Icon**: Clean robot icon in the VS Code Activity Bar (left sidebar)
+- **Embedded UI**: Complete interface directly in the sidebar panel (no separate windows)
+- **Native Feel**: Matches VS Code's native styling and behavior patterns
+- **Responsive Design**: Optimized for narrow sidebar width with collapsible sections
 
 ### 🤖 Intelligent Agent System
-- **Multi-Agent Workflow**: Different specialized agents handle various tasks:
+- **Multi-Agent Workflow**: Specialized agents for different tasks:
   - 📊 **Code Analyzer**: Analyzes project structure and dependencies
   - 📝 **Story Processor**: Breaks down user requirements
   - 🔍 **File Analyzer**: Scans and understands existing codebase
   - ⚙️ **Code Generator**: Creates implementation code
   - 📝 **File Manager**: Handles file creation and updates
-- **Agent Visualization**: See which agent is currently active with avatars and status
+- **Real-time Agent Visualization**: See which agent is active with avatars and progress
+- **Live Progress Tracking**: Visual progress bar showing task completion (0-100%)
 
 ### 📁 Advanced File Handling
 - **File Modification Tracking**: Clear indication of which files are being edited
@@ -25,11 +26,11 @@ An intelligent AI-powered VS Code extension that analyzes your project and imple
 - **Quick File Access**: One-click option to view modified files
 - **Context-Aware Updates**: Code placement respects existing file structure
 
-### 🔧 Developer Experience
-- **Keyboard Shortcuts**: `Ctrl+Shift+A` (or `Cmd+Shift+A` on Mac) to start
-- **Command Palette Integration**: Access via "Agentic Assistant" commands
-- **Context Menu Support**: Right-click in explorer to start assistant
-- **Progress Tracking**: Visual progress indicators for long-running tasks
+### � Task History & Management
+- **History Panel**: Separate collapsible section showing past tasks
+- **Task Status**: Visual indicators for completed, failed, and running tasks
+- **File Tracking**: See which files were modified for each task
+- **Quick Actions**: Clear history, refresh status, and more
 
 ## 🚀 Getting Started
 
@@ -54,24 +55,38 @@ An intelligent AI-powered VS Code extension that analyzes your project and imple
 
 3. **Launch Extension:**
    - Press `F5` to open a new VS Code window with the extension loaded
-   - Or press `Ctrl+Shift+P` and search for "Agentic Assistant"
+   - Look for the 🤖 robot icon in the Activity Bar (left sidebar)
+   - Click the icon to open the Agentic Assistant panel
 
 ### Usage
 
-1. **Start the Assistant:**
-   - Use `Ctrl+Shift+A` shortcut
-   - Or open Command Palette (`Ctrl+Shift+P`) → "Start Agentic Assistant"
-   - Or right-click in Explorer → "Start Agentic Assistant"
+#### Sidebar Interface
 
-2. **Enter User Story:**
-   ```
-   Example: "Create a todo list component with add/remove functionality"
-   ```
+1. **Open the Sidebar:**
+   - Click the 🤖 robot icon in the Activity Bar
+   - The Agentic Assistant panel will open on the left
 
-3. **Watch the Magic:**
-   - See real-time progress as different agents work
-   - Get notifications when files are modified
-   - View enhanced logs with timestamps and agent information
+2. **Using the Assistant:**
+   - Enter your user story in the text area
+   - Click "Run" or press `Ctrl+Enter`
+   - Watch real-time progress and agent activity
+   - View file modifications as they happen
+
+3. **Monitor Progress:**
+   - Connection status indicator (🔴 Disconnected, 🟡 Connecting, 🟢 Connected)
+   - Current task display when running
+   - Agent progress section with avatar and status
+   - Live progress bar (0-100%)
+
+4. **Task History:**
+   - Expand the "Task History" section
+   - See all previous tasks with status icons
+   - Click on tasks to see details and modified files
+   - Use the clear button to reset history
+
+#### Full Interface (Optional)
+- Click the window icon in the sidebar to open the full webview interface
+- Provides the same functionality in a larger, dedicated panel
 
 ## 🎯 Example User Stories
 
@@ -83,24 +98,40 @@ An intelligent AI-powered VS Code extension that analyzes your project and imple
 
 ## ⚙️ Configuration
 
-Access extension settings via VS Code Settings:
+Access extension settings via VS Code Settings (`Ctrl+,`):
 
-- **Server URL**: WebSocket endpoint for the agent backend
-- **Auto Open Files**: Automatically open modified files in editor
-- **Show Notifications**: Toggle file modification notifications
+- **Server URL**: WebSocket endpoint for the agent backend (default: `ws://localhost:8000`)
+- **Auto Open Files**: Automatically open modified files in editor (default: `true`)
+- **Show Notifications**: Toggle file modification notifications (default: `true`)
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    WebSocket    ┌──────────────────┐
-│   VS Code       │ ◄──────────────► │   Backend        │
-│   Extension     │    ws://8000     │   Agent Server   │
-│                 │                  │                  │
-│  ┌─────────────┐│                  │ ┌──────────────┐ │
-│  │  Webview    ││                  │ │   AI Agents  │ │
-│  │     UI      ││                  │ │   Workflow   │ │
-│  └─────────────┘│                  │ └──────────────┘ │
-└─────────────────┘                  └──────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    VS Code Interface                        │
+├─────────────────────────────────────────────────────────────┤
+│  Activity Bar  │           Sidebar Panel                    │
+│  ┌─────────┐   │  ┌─────────────────────────────────────┐   │
+│  │    🤖   │───┼─►│  Agentic Assistant Chat View       │   │
+│  │         │   │  │  • User story input                │   │
+│  │ (Icon)  │   │  │  • Real-time progress             │   │
+│  └─────────┘   │  │  • Agent visualization            │   │
+│                │  │  • Live log feed                  │   │
+│                │  └─────────────────────────────────────┘   │
+│                │  ┌─────────────────────────────────────┐   │
+│                │  │  Task History View                 │   │
+│                │  │  • Previous tasks                  │   │
+│                │  │  • File modifications             │   │
+│                │  │  • Status indicators              │   │
+│                │  └─────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                                │
+                    WebSocket   │
+                                ▼
+                ┌─────────────────────────────┐
+                │     Backend Agent Server    │
+                │     (ws://localhost:8000)   │
+                └─────────────────────────────┘
 ```
 
 ## 🛠️ Development
@@ -108,19 +139,22 @@ Access extension settings via VS Code Settings:
 ### Project Structure
 ```
 ├── src/
-│   └── extension.ts     # Main extension logic
+│   └── extension.ts         # Main extension logic with webview provider
 ├── webview-ui/
-│   └── index.html       # Enhanced UI with animations
-├── package.json         # Extension manifest
-├── tsconfig.json        # TypeScript configuration
-└── README.md           # This file
+│   ├── index.html          # Full webview interface
+│   └── sidebar.html        # Optimized sidebar interface
+├── resources/
+│   └── robot-icon.svg      # Activity bar icon
+├── package.json            # Extension manifest with sidebar configuration
+└── README.md              # This file
 ```
 
-### Key Files
+### Key Components
 
-- **`src/extension.ts`**: Core extension logic with enhanced WebSocket handling
-- **`webview-ui/index.html`**: Modern UI with animations and agent visualization
-- **`package.json`**: Extension configuration with commands and keybindings
+- **`AgenticChatViewProvider`**: Webview provider for sidebar UI
+- **`AgenticHistoryProvider`**: Tree data provider for task history
+- **Sidebar HTML**: Responsive interface optimized for narrow panels
+- **WebSocket Integration**: Real-time communication with backend
 
 ### Building & Testing
 
@@ -131,68 +165,85 @@ npm run compile
 # Watch mode for development  
 npm run watch
 
-# Package extension
-vsce package
+# Test the extension
+# Press F5 in VS Code to launch extension development host
 ```
 
-## 🔄 Backend Integration
+## 🎨 UI Features
 
-The extension connects to a separate backend server that should be running on `ws://localhost:8000/ws/agent`. The backend handles:
+### Sidebar Optimizations
+- **Responsive Layout**: Adapts to narrow sidebar width
+- **Collapsible Sections**: Current task and progress can be hidden when inactive
+- **Compact Controls**: Buttons and inputs sized for sidebar usage
+- **Smooth Animations**: Slide-in effects for new log entries
+- **Status Indicators**: Color-coded connection and task status
 
-- Natural language processing of user stories
-- Project analysis and code generation
-- File system operations
-- Multi-agent coordination
+### Visual Enhancements
+- **Agent Avatars**: Different emoji avatars for each agent type
+- **Progress Visualization**: Animated progress bar with gradient fill
+- **File Badges**: Highlighted file names in logs
+- **Status Colors**: Color-coded messages based on agent status
+- **Hover Effects**: Interactive elements with subtle hover states
 
-**Note**: Backend server is provided separately and must be running before using the extension.
+## 🔧 VS Code Integration
 
-## 🎨 UI Enhancements
+### Native Features
+- **Activity Bar Integration**: Custom icon alongside Explorer, Git, etc.
+- **Sidebar Panel**: Native webview embedded in sidebar
+- **Command Palette**: All commands accessible via `Ctrl+Shift+P`
+- **Context Menus**: Right-click options in file explorer
+- **Keyboard Shortcuts**: `Ctrl+Shift+A` to open, `Ctrl+Enter` to submit
+- **Settings Integration**: Configuration options in VS Code settings
 
-### Visual Features
-- **Gradient Backgrounds**: Modern gradient buttons and headers
-- **Smooth Transitions**: 0.3s ease transitions for all interactive elements
-- **Progress Animations**: Animated progress bars and status indicators
-- **Agent Avatars**: Visual representation of active agents
-- **Status Bar**: Real-time connection and task status
-- **Enhanced Logging**: Color-coded, timestamped logs with file indicators
+### Extension Points
+- **View Containers**: Custom activity bar container
+- **Webview Views**: Embedded webview for sidebar UI
+- **Tree Data Providers**: History management
+- **Commands**: All actions registered as VS Code commands
+- **Configurations**: User-configurable options
 
-### Animations
-- **Slide Down**: Agent info panels slide in smoothly
-- **Fade In Up**: Log entries appear with subtle upward motion
-- **Pulse Animation**: Status indicators pulse to show activity
-- **Loading Spinners**: Smooth rotating spinners for processing states
+## 📝 Usage Tips
 
-## 🔧 Technical Features
+1. **Quick Start**: Click the robot icon → enter story → click Run
+2. **Keyboard Shortcuts**: Use `Ctrl+Enter` in the text area to submit
+3. **Monitor Progress**: Watch the agent avatars and progress bar
+4. **Track Changes**: File notifications show what's being modified  
+5. **History Review**: Expand task history to see previous work
+6. **Full Interface**: Use window icon for expanded view when needed
 
-- **TypeScript**: Fully typed codebase for better reliability
-- **WebSocket Integration**: Real-time bidirectional communication
-- **Error Handling**: Comprehensive error handling and user feedback
-- **File System Integration**: Smart file modification tracking
-- **VS Code API**: Deep integration with VS Code's extension APIs
+## 🚀 What's New
 
-## 📝 Contributing
+### Sidebar Integration
+- ✅ Native Activity Bar icon (🤖)
+- ✅ Embedded webview in sidebar panel
+- ✅ Optimized responsive design for narrow width
+- ✅ Real-time agent visualization with progress
+- ✅ Task history with collapsible details
+- ✅ Native VS Code styling and behavior
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with proper TypeScript types
-4. Test with the backend server
-5. Submit a pull request
+### Enhanced UX
+- ✅ Cody-like sidebar experience
+- ✅ No separate windows or popups
+- ✅ Smooth animations and transitions
+- ✅ Color-coded status indicators
+- ✅ Compact, efficient interface design
 
 ## 🐛 Troubleshooting
 
-**Extension won't start:**
-- Ensure VS Code version is 1.80.0+
-- Check that TypeScript compiled successfully (`npm run compile`)
+**Sidebar doesn't appear:**
+- Ensure extension is installed and activated
+- Look for the 🤖 icon in the Activity Bar
+- Try reloading VS Code window (`Ctrl+Shift+P` → "Developer: Reload Window")
 
 **Can't connect to backend:**
 - Verify backend server is running on `ws://localhost:8000`
-- Check firewall settings
-- Look for connection errors in the extension logs
+- Check connection status indicator in sidebar header
+- Review WebSocket URL in extension settings
 
-**Files not updating:**
-- Ensure workspace folder is open in VS Code
-- Check file permissions
-- Verify backend has write access to project directory
+**Interface looks broken:**
+- Ensure VS Code is version 1.80.0 or higher
+- Try refreshing the webview (click refresh icon in sidebar title)
+- Check browser console for JavaScript errors
 
 ## 📜 License
 
@@ -200,4 +251,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Made with ❤️ for the VS Code community** 
+**🎉 Now with native sidebar integration - just like the extensions you love!**
+
+The Agentic Assistant now provides a seamless, native VS Code experience with:
+- One-click access from the Activity Bar
+- Complete interface embedded in the sidebar
+- Real-time agent visualization and progress tracking
+- Task history and file modification tracking
+- Professional, responsive design optimized for productivity
+
+**Backend Note**: The extension connects to your separately running backend server. The frontend is complete and ready for integration with any compatible agent service. 

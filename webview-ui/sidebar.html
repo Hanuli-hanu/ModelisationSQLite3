@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic Assistant</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--vscode-font-family);
+      font-size: var(--vscode-font-size);
+      color: var(--vscode-foreground);
+      background-color: var(--vscode-sideBar-background);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 12px;
+      border-bottom: 1px solid var(--vscode-panel-border);
+      background-color: var(--vscode-sideBarSectionHeader-background);
+    }
+
+    .header h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--vscode-sideBarTitle-foreground);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--vscode-charts-red);
+      animation: pulse 2s infinite;
+    }
+
+    .status-indicator.connected {
+      background-color: var(--vscode-charts-green);
+    }
+
+    .status-indicator.connecting {
+      background-color: var(--vscode-charts-yellow);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .input-section {
+      padding: 12px;
+      border-bottom: 1px solid var(--vscode-panel-border);
+      background-color: var(--vscode-sideBar-background);
+    }
+
+    .story-input {
+      width: 100%;
+      min-height: 60px;
+      padding: 8px;
+      background-color: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border);
+      border-radius: 4px;
+      font-family: var(--vscode-font-family);
+      font-size: 12px;
+      resize: vertical;
+      margin-bottom: 8px;
+    }
+
+    .story-input:focus {
+      outline: none;
+      border-color: var(--vscode-focusBorder);
+      background-color: var(--vscode-inputOption-activeBackground);
+    }
+
+    .story-input::placeholder {
+      color: var(--vscode-input-placeholderForeground);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 6px 12px;
+      background-color: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: var(--vscode-button-hoverBackground);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: var(--vscode-button-secondaryBackground);
+      color: var(--vscode-button-secondaryForeground);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--vscode-button-secondaryHoverBackground);
+    }
+
+    .spinner {
+      display: none;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid transparent;
+      border-top: 1.5px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .current-task {
+      padding: 8px 12px;
+      background-color: var(--vscode-inputValidation-infoBackground);
+      border-left: 3px solid var(--vscode-charts-blue);
+      margin-bottom: 1px;
+      font-size: 11px;
+      display: none;
+    }
+
+    .current-task.visible {
+      display: block;
+    }
+
+    .current-task-label {
+      color: var(--vscode-charts-blue);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .current-task-text {
+      color: var(--vscode-foreground);
+    }
+
+    .progress-section {
+      padding: 8px 12px;
+      background-color: var(--vscode-panel-background);
+      border-bottom: 1px solid var(--vscode-panel-border);
+      display: none;
+    }
+
+    .progress-section.visible {
+      display: block;
+    }
+
+    .agent-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .agent-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--vscode-charts-purple), var(--vscode-charts-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 8px;
+    }
+
+    .agent-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .agent-name {
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--vscode-foreground);
+    }
+
+    .agent-status {
+      font-size: 10px;
+      color: var(--vscode-descriptionForeground);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .progress-container {
+      background-color: var(--vscode-progressBar-background);
+      border-radius: 8px;
+      height: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--vscode-charts-blue), var(--vscode-charts-green));
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 8px;
+    }
+
+    .log-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .log-entry {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--vscode-list-dropBackground);
+      font-size: 11px;
+      line-height: 1.4;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .log-entry:hover {
+      background-color: var(--vscode-list-hoverBackground);
+    }
+
+    .log-timestamp {
+      color: var(--vscode-descriptionForeground);
+      font-size: 9px;
+      margin-right: 6px;
+    }
+
+    .log-agent {
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .log-message {
+      color: var(--vscode-foreground);
+      word-wrap: break-word;
+    }
+
+    .log-file {
+      display: inline-block;
+      background-color: var(--vscode-badge-background);
+      color: var(--vscode-badge-foreground);
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-size: 9px;
+      margin-left: 4px;
+      margin-top: 2px;
+    }
+
+    /* Status-based styling */
+    .status-connecting { color: var(--vscode-charts-blue); }
+    .status-connected { color: var(--vscode-charts-green); }
+    .status-processing { color: var(--vscode-charts-purple); }
+    .status-file_update { 
+      color: var(--vscode-charts-yellow);
+      background-color: rgba(255, 193, 7, 0.1);
+    }
+    .status-completed { color: var(--vscode-charts-green); }
+    .status-error { color: var(--vscode-errorForeground); }
+    .status-closed { color: var(--vscode-charts-orange); }
+
+    .empty-state {
+      padding: 20px 12px;
+      text-align: center;
+      color: var(--vscode-descriptionForeground);
+      font-size: 11px;
+    }
+
+    .empty-state-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+
+    /* Scrollbar styling */
+    .log-section::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .log-section::-webkit-scrollbar-track {
+      background: var(--vscode-scrollbar-shadow);
+    }
+
+    .log-section::-webkit-scrollbar-thumb {
+      background-color: var(--vscode-scrollbarSlider-background);
+      border-radius: 3px;
+    }
+
+    .log-section::-webkit-scrollbar-thumb:hover {
+      background-color: var(--vscode-scrollbarSlider-hoverBackground);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h3>
+      <span class="status-indicator" id="status-indicator"></span>
+      <span id="status-text">Disconnected</span>
+    </h3>
+  </div>
+
+  <div class="input-section">
+    <textarea 
+      id="story-input" 
+      class="story-input" 
+      placeholder="Enter your user story here...&#10;&#10;Examples:&#10;• Create a todo list component&#10;• Add user authentication&#10;• Fix the login form validation"
+      rows="3"
+    ></textarea>
+    
+    <div class="button-row">
+      <button id="run-btn" class="btn">
+        <span class="spinner" id="spinner"></span>
+        <span id="run-text">Run</span>
+      </button>
+      <button id="clear-btn" class="btn btn-secondary">Clear</button>
+    </div>
+  </div>
+
+  <div class="current-task" id="current-task">
+    <div class="current-task-label">Current Task:</div>
+    <div class="current-task-text" id="current-task-text"></div>
+  </div>
+
+  <div class="progress-section" id="progress-section">
+    <div class="agent-info">
+      <div class="agent-avatar" id="agent-avatar">AI</div>
+      <div class="agent-details">
+        <div class="agent-name" id="agent-name">AI Agent</div>
+        <div class="agent-status" id="agent-status">Ready</div>
+      </div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="log-section" id="log-section">
+    <div class="empty-state">
+      <div class="empty-state-icon">🤖</div>
+      <div>Ready to help you build amazing features!</div>
+      <br>
+      <div style="font-size: 10px; opacity: 0.7;">Enter a user story above and click Run to get started.</div>
+    </div>
+  </div>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+    
+    // UI elements
+    const statusIndicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+    const storyInput = document.getElementById('story-input');
+    const runBtn = document.getElementById('run-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const spinner = document.getElementById('spinner');
+    const runText = document.getElementById('run-text');
+    const currentTask = document.getElementById('current-task');
+    const currentTaskText = document.getElementById('current-task-text');
+    const progressSection = document.getElementById('progress-section');
+    const agentAvatar = document.getElementById('agent-avatar');
+    const agentName = document.getElementById('agent-name');
+    const agentStatus = document.getElementById('agent-status');
+    const progressBar = document.getElementById('progress-bar');
+    const logSection = document.getElementById('log-section');
+
+    let isRunning = false;
+
+    // State management
+    function updateConnectionStatus(status, text) {
+      statusIndicator.className = `status-indicator ${status}`;
+      statusText.textContent = text;
+    }
+
+    function showCurrentTask(task) {
+      currentTaskText.textContent = task;
+      currentTask.classList.add('visible');
+    }
+
+    function hideCurrentTask() {
+      currentTask.classList.remove('visible');
+    }
+
+    function showProgress(name, status, avatar = 'AI') {
+      agentName.textContent = name;
+      agentStatus.textContent = status;
+      agentAvatar.textContent = avatar;
+      progressSection.classList.add('visible');
+    }
+
+    function hideProgress() {
+      progressSection.classList.remove('visible');
+    }
+
+    function updateProgress(percent) {
+      progressBar.style.width = percent + '%';
+    }
+
+    function addLogEntry(data) {
+      // Remove empty state if it exists
+      const emptyState = logSection.querySelector('.empty-state');
+      if (emptyState) {
+        emptyState.remove();
+      }
+
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      // Determine styling and content
+      let statusClass = '';
+      let agentIcon = '🤖';
+      let agentText = 'Agent';
+      let fileInfo = '';
+
+      if (data.status) {
+        statusClass = `status-${data.status.toLowerCase()}`;
+        
+        switch(data.status.toLowerCase()) {
+          case 'connecting':
+            agentIcon = '🔄'; agentText = 'Connection';
+            updateConnectionStatus('connecting', 'Connecting...');
+            break;
+          case 'connected':
+            agentIcon = '✅'; agentText = 'Connected';
+            updateConnectionStatus('connected', 'Connected');
+            showProgress('Code Analyzer', 'Initializing...', '📊');
+            updateProgress(10);
+            break;
+          case 'processing':
+            agentIcon = '⚡'; agentText = 'Processing';
+            showProgress('Story Processor', 'Breaking down requirements...', '📝');
+            updateProgress(30);
+            break;
+          case 'file_analysis':
+            agentIcon = '🔍'; agentText = 'Analyzing';
+            showProgress('File Analyzer', 'Scanning project...', '🔍');
+            updateProgress(50);
+            break;
+          case 'code_generation':
+            agentIcon = '⚙️'; agentText = 'Generating';
+            showProgress('Code Generator', 'Creating code...', '⚙️');
+            updateProgress(70);
+            break;
+          case 'file_update':
+            agentIcon = '📝'; agentText = 'Writing';
+            showProgress('File Manager', 'Updating files...', '📝');
+            updateProgress(90);
+            break;
+          case 'completed':
+            agentIcon = '🎉'; agentText = 'Complete';
+            showProgress('Task Complete', 'Success!', '🎉');
+            updateProgress(100);
+            hideCurrentTask();
+            setTimeout(hideProgress, 3000);
+            break;
+          case 'error':
+            agentIcon = '❌'; agentText = 'Error';
+            updateConnectionStatus('disconnected', 'Error');
+            hideCurrentTask();
+            hideProgress();
+            break;
+          case 'closed':
+            agentIcon = '🔌'; agentText = 'Disconnected';
+            updateConnectionStatus('disconnected', 'Disconnected');
+            hideCurrentTask();
+            hideProgress();
+            break;
+        }
+      }
+
+      // File information
+      if (data.file || data.filename) {
+        const fileName = data.file || data.filename;
+        fileInfo = `<span class="log-file">${fileName.split('/').pop()}</span>`;
+      }
+
+      // Create log entry
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${statusClass}`;
+      logEntry.innerHTML = `
+        <span class="log-timestamp">[${timestamp}]</span>
+        <span class="log-agent">${agentIcon} ${agentText}:</span>
+        <span class="log-message">${data.message || JSON.stringify(data, null, 2)}</span>
+        ${fileInfo}
+      `;
+
+      logSection.appendChild(logEntry);
+      logSection.scrollTop = logSection.scrollHeight;
+    }
+
+    function clearLog() {
+      logSection.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🧹</div>
+          <div>Log cleared. Ready for new tasks!</div>
+        </div>
+      `;
+      hideCurrentTask();
+      hideProgress();
+      updateProgress(0);
+      updateConnectionStatus('disconnected', 'Disconnected');
+    }
+
+    // Event listeners
+    runBtn.addEventListener('click', () => {
+      const story = storyInput.value.trim();
+      if (!story) {
+        addLogEntry({
+          status: 'ERROR',
+          message: 'Please enter a user story first!'
+        });
+        return;
+      }
+
+      // Update UI state
+      isRunning = true;
+      runBtn.disabled = true;
+      spinner.style.display = 'inline-block';
+      runText.textContent = 'Running...';
+      
+      // Clear previous logs
+      logSection.innerHTML = '';
+      showCurrentTask(story);
+      updateProgress(0);
+
+      // Send to extension
+      vscode.postMessage({
+        command: 'startStory',
+        story: story
+      });
+
+      // Auto re-enable after timeout
+      setTimeout(() => {
+        if (isRunning) {
+          isRunning = false;
+          runBtn.disabled = false;
+          spinner.style.display = 'none';
+          runText.textContent = 'Run';
+        }
+      }, 60000);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearLog();
+    });
+
+    // Handle Ctrl+Enter to submit
+    storyInput.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter' && !runBtn.disabled) {
+        runBtn.click();
+      }
+    });
+
+    // Message handler
+    window.addEventListener('message', event => {
+      const message = event.data;
+      
+      if (message.command === 'log') {
+        addLogEntry(message.data);
+        
+        // Handle completion
+        if (['COMPLETED', 'ERROR', 'CLOSED'].includes(message.data.status)) {
+          setTimeout(() => {
+            isRunning = false;
+            runBtn.disabled = false;
+            spinner.style.display = 'none';
+            runText.textContent = 'Run';
+          }, 1000);
+        }
+      }
+    });
+
+    // Initialize
+    updateConnectionStatus('disconnected', 'Disconnected');
+  </script>
+</body>
+</html>
