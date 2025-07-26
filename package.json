@@ -15,9 +15,59 @@
     "commands": [
       {
         "command": "agentic.start",
-        "title": "Start Agentic Assistant"
+        "title": "🚀 Start Agentic Assistant",
+        "category": "Agentic"
+      },
+      {
+        "command": "agentic.stop",
+        "title": "⏹️ Stop Agentic Assistant",
+        "category": "Agentic"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "agentic.start",
+          "group": "agentic",
+          "when": "explorerResourceIsFolder"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "agentic.start"
+        },
+        {
+          "command": "agentic.stop"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "agentic.start",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      }
+    ],
+    "configuration": {
+      "title": "Agentic Assistant",
+      "properties": {
+        "agentic.serverUrl": {
+          "type": "string",
+          "default": "ws://localhost:8000",
+          "description": "The WebSocket URL for the Agentic backend server"
+        },
+        "agentic.autoOpenFiles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open files when they are modified by the agent"
+        },
+        "agentic.showNotifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notifications when files are created or modified"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -27,7 +77,9 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@types/json-schema": "^7.0.15",
     "@types/node": "^18.0.0",
+    "@types/semver": "^7.7.0",
     "@types/vscode": "^1.80.0",
     "@types/ws": "^8.18.1",
     "typescript": "^5.2.0",

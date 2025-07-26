@@ -4,113 +4,601 @@
   <meta charset="UTF-8">
   <title>Agentic Assistant</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: var(--vscode-font-family);
-      padding: 1em;
+      padding: 20px;
       color: var(--vscode-foreground);
       background-color: var(--vscode-editor-background);
+      line-height: 1.6;
     }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--vscode-charts-blue), var(--vscode-charts-purple));
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .input-section {
+      background-color: var(--vscode-sideBar-background);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--vscode-widget-border);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .input-section:hover {
+      border-color: var(--vscode-focusBorder);
+      box-shadow: 0 0 10px rgba(var(--vscode-focusBorder), 0.1);
+    }
+
     textarea {
       width: 100%;
-      height: 80px;
-      margin-bottom: 1em;
-      padding: 8px;
+      height: 100px;
+      margin-bottom: 15px;
+      padding: 12px;
       background-color: var(--vscode-input-background);
       color: var(--vscode-input-foreground);
       border: 1px solid var(--vscode-input-border);
-      border-radius: 2px;
+      border-radius: 6px;
+      font-family: var(--vscode-editor-font-family);
+      font-size: 14px;
+      resize: vertical;
+      transition: border-color 0.3s ease;
     }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--vscode-focusBorder);
+      box-shadow: 0 0 0 2px rgba(var(--vscode-focusBorder), 0.2);
+    }
+
+    .button-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     button {
-      background-color: var(--vscode-button-background);
+      background: linear-gradient(135deg, var(--vscode-button-background), var(--vscode-button-hoverBackground));
       color: var(--vscode-button-foreground);
       border: none;
-      padding: 8px 16px;
-      border-radius: 2px;
+      padding: 12px 24px;
+      border-radius: 6px;
       cursor: pointer;
-      margin-bottom: 1em;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
-    button:hover {
-      background-color: var(--vscode-button-hoverBackground);
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
+
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
     }
+
+    .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .status-bar {
+      background-color: var(--vscode-statusBar-background);
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid var(--vscode-charts-green);
+      transition: all 0.3s ease;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--vscode-charts-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .agent-info {
+      background-color: var(--vscode-panel-background);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid var(--vscode-panel-border);
+      display: none;
+    }
+
+    .agent-info.active {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .agent-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--vscode-charts-purple), var(--vscode-charts-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      margin-right: 12px;
+    }
+
+    .progress-container {
+      background-color: var(--vscode-progressBar-background);
+      border-radius: 10px;
+      height: 6px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--vscode-charts-blue), var(--vscode-charts-green));
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 10px;
+    }
+
     #log {
-      background-color: var(--vscode-editor-background);
-      padding: 10px;
-      height: 300px;
+      background-color: var(--vscode-terminal-background);
+      padding: 20px;
+      height: 400px;
       overflow-y: auto;
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 2px;
+      border-radius: 8px;
       font-family: var(--vscode-editor-font-family);
-      font-size: var(--vscode-editor-font-size);
+      font-size: 13px;
+      line-height: 1.5;
     }
-    .status-connecting { color: var(--vscode-charts-blue); }
-    .status-connected { color: var(--vscode-charts-green); }
-    .status-error { color: var(--vscode-errorForeground); }
-    .status-closed { color: var(--vscode-charts-orange); }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border-left: 3px solid transparent;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .log-entry:hover {
+      background-color: var(--vscode-list-hoverBackground);
+    }
+
+    .log-timestamp {
+      color: var(--vscode-descriptionForeground);
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    .log-agent {
+      color: var(--vscode-charts-purple);
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .log-file {
+      color: var(--vscode-charts-blue);
+      font-weight: 500;
+      background-color: var(--vscode-badge-background);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    .status-connecting { 
+      color: var(--vscode-charts-blue); 
+      border-left-color: var(--vscode-charts-blue);
+    }
+    .status-connected { 
+      color: var(--vscode-charts-green); 
+      border-left-color: var(--vscode-charts-green);
+    }
+    .status-error { 
+      color: var(--vscode-errorForeground); 
+      border-left-color: var(--vscode-errorForeground);
+    }
+    .status-closed { 
+      color: var(--vscode-charts-orange); 
+      border-left-color: var(--vscode-charts-orange);
+    }
+    .status-processing { 
+      color: var(--vscode-charts-purple); 
+      border-left-color: var(--vscode-charts-purple);
+    }
+    .status-file-update { 
+      color: var(--vscode-charts-yellow); 
+      border-left-color: var(--vscode-charts-yellow);
+      background-color: rgba(var(--vscode-charts-yellow), 0.05);
+    }
+
+    .file-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--vscode-editorWidget-background);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+
+    .file-icon {
+      width: 12px;
+      height: 12px;
+      background-color: var(--vscode-charts-blue);
+      border-radius: 2px;
+    }
+
+    .scrollbar-custom {
+      scrollbar-width: thin;
+      scrollbar-color: var(--vscode-scrollbarSlider-background) var(--vscode-scrollbar-shadow);
+    }
+
+    .scrollbar-custom::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-track {
+      background: var(--vscode-scrollbar-shadow);
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+      background-color: var(--vscode-scrollbarSlider-background);
+      border-radius: 4px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+      background-color: var(--vscode-scrollbarSlider-hoverBackground);
+    }
   </style>
 </head>
 <body>
-  <h2>Agentic Assistant</h2>
-  <textarea id="story" placeholder="Enter your user story here (e.g., 'Create a todo list component with add/remove functionality')..."></textarea><br>
-  <button id="run">Run Agent</button>
-  <div id="log">
-    <p><em>Ready to execute user stories. Enter a story above and click "Run Agent".</em></p>
-    <p><em>Note: Make sure your agent server is running on ws://localhost:8000</em></p>
+  <div class="container">
+    <h2>
+      <div class="header-icon">AI</div>
+      Agentic Assistant
+    </h2>
+    
+    <div class="status-bar">
+      <div class="status-indicator"></div>
+      <span id="status-text">Ready to execute user stories</span>
+    </div>
+
+    <div class="agent-info" id="agent-info">
+      <div style="display: flex; align-items: center; margin-bottom: 10px;">
+        <div class="agent-avatar" id="agent-avatar">AI</div>
+        <div>
+          <div style="font-weight: 600;" id="agent-name">Code Agent</div>
+          <div style="font-size: 12px; color: var(--vscode-descriptionForeground);" id="agent-status">Analyzing project structure...</div>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <textarea 
+        id="story" 
+        placeholder="🚀 Enter your user story here (e.g., 'Create a todo list component with add/remove functionality')..."
+      ></textarea>
+      
+      <div class="button-container">
+        <button id="run">
+          <div class="spinner" id="spinner"></div>
+          <span id="button-text">Run Agent</span>
+        </button>
+        <button id="clear" style="background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground);">
+          Clear Log
+        </button>
+      </div>
+    </div>
+
+    <div id="log" class="scrollbar-custom">
+      <div class="log-entry">
+        <span class="log-timestamp">[Ready]</span>
+        <span class="log-agent">🤖 System:</span>
+        <span>Ready to execute user stories. Enter a story above and click "Run Agent".</span>
+      </div>
+      <div class="log-entry">
+        <span class="log-timestamp">[Info]</span>
+        <span class="log-agent">🔗 Connection:</span>
+        <span>Backend server should be running on ws://localhost:8000</span>
+      </div>
+    </div>
   </div>
 
   <script>
     const vscode = acquireVsCodeApi();
     const runButton = document.getElementById('run');
+    const clearButton = document.getElementById('clear');
+    const spinner = document.getElementById('spinner');
+    const buttonText = document.getElementById('button-text');
+    const agentInfo = document.getElementById('agent-info');
+    const statusText = document.getElementById('status-text');
+    const progressBar = document.getElementById('progress-bar');
 
+    let currentProgress = 0;
+    let isRunning = false;
+
+    // Animation utilities
+    function updateProgress(percent) {
+      progressBar.style.width = percent + '%';
+    }
+
+    function showAgentInfo(name, status, avatar = 'AI') {
+      document.getElementById('agent-name').textContent = name;
+      document.getElementById('agent-status').textContent = status;
+      document.getElementById('agent-avatar').textContent = avatar;
+      agentInfo.classList.add('active');
+    }
+
+    function hideAgentInfo() {
+      agentInfo.classList.remove('active');
+    }
+
+    function updateStatus(text, indicator = 'green') {
+      statusText.textContent = text;
+      const statusIndicator = document.querySelector('.status-indicator');
+      statusIndicator.style.backgroundColor = `var(--vscode-charts-${indicator})`;
+    }
+
+    function addLogEntry(data) {
+      const logBox = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      
+      // Determine log type and formatting
+      let statusClass = '';
+      let agentIcon = '🤖';
+      let agentName = 'Agent';
+      let fileInfo = '';
+      
+      if (data.status) {
+        statusClass = `status-${data.status.toLowerCase()}`;
+        
+        switch(data.status.toLowerCase()) {
+          case 'connecting':
+            agentIcon = '🔄';
+            agentName = 'Connection';
+            updateStatus('Connecting to backend...', 'blue');
+            break;
+          case 'connected':
+            agentIcon = '✅';
+            agentName = 'Connection';
+            updateStatus('Connected to backend', 'green');
+            showAgentInfo('Code Analyzer', 'Initializing project analysis...', '📊');
+            updateProgress(10);
+            break;
+          case 'processing':
+            agentIcon = '⚡';
+            agentName = 'Processor';
+            updateStatus('Processing user story...', 'purple');
+            showAgentInfo('Story Processor', 'Breaking down requirements...', '📝');
+            updateProgress(30);
+            break;
+          case 'file_analysis':
+            agentIcon = '🔍';
+            agentName = 'Analyzer';
+            updateStatus('Analyzing project files...', 'blue');
+            showAgentInfo('File Analyzer', 'Scanning project structure...', '🔍');
+            updateProgress(50);
+            break;
+          case 'code_generation':
+            agentIcon = '⚙️';
+            agentName = 'Generator';
+            updateStatus('Generating code...', 'purple');
+            showAgentInfo('Code Generator', 'Creating implementation...', '⚙️');
+            updateProgress(70);
+            break;
+          case 'file_update':
+            agentIcon = '📝';
+            agentName = 'File Writer';
+            updateStatus('Updating files...', 'yellow');
+            showAgentInfo('File Manager', 'Writing changes to files...', '📝');
+            updateProgress(90);
+            break;
+          case 'completed':
+            agentIcon = '🎉';
+            agentName = 'Completed';
+            updateStatus('Task completed successfully!', 'green');
+            showAgentInfo('Task Complete', 'All changes have been applied!', '🎉');
+            updateProgress(100);
+            setTimeout(hideAgentInfo, 3000);
+            break;
+          case 'error':
+            agentIcon = '❌';
+            agentName = 'Error';
+            updateStatus('Error occurred', 'red');
+            showAgentInfo('Error Handler', 'Something went wrong...', '❌');
+            break;
+        }
+      }
+
+      // Extract file information if present
+      if (data.file || data.filename) {
+        const fileName = data.file || data.filename;
+        fileInfo = `<span class="file-indicator"><div class="file-icon"></div>${fileName}</span>`;
+      }
+
+      // Create enhanced log entry
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${statusClass}`;
+      logEntry.innerHTML = `
+        <span class="log-timestamp">[${timestamp}]</span>
+        <span class="log-agent">${agentIcon} ${agentName}:</span>
+        <span>${data.message || JSON.stringify(data, null, 2)}</span>
+        ${fileInfo}
+      `;
+      
+      logBox.appendChild(logEntry);
+      logBox.scrollTop = logBox.scrollHeight;
+
+      // Add subtle animation
+      logEntry.style.opacity = '0';
+      logEntry.style.transform = 'translateY(10px)';
+      requestAnimationFrame(() => {
+        logEntry.style.transition = 'all 0.3s ease';
+        logEntry.style.opacity = '1';
+        logEntry.style.transform = 'translateY(0)';
+      });
+    }
+
+    // Event listeners
     runButton.addEventListener('click', () => {
       const story = document.getElementById('story').value.trim();
       if (story) {
+        isRunning = true;
         runButton.disabled = true;
-        runButton.textContent = 'Running...';
+        spinner.style.display = 'inline-block';
+        buttonText.textContent = 'Running...';
         
+        // Reset progress
+        currentProgress = 0;
+        updateProgress(0);
+        
+        // Clear previous logs and add starting message
         const logBox = document.getElementById('log');
-        logBox.innerHTML = `<p class="status-connecting"><strong>Sending user story to agent...</strong></p>`;
+        logBox.innerHTML = '';
+        
+        addLogEntry({ 
+          status: 'PROCESSING', 
+          message: `Starting execution of user story: "${story}"` 
+        });
         
         vscode.postMessage({ command: 'startStory', story: story });
         
-        // Re-enable button after 2 seconds to allow multiple runs
+        // Auto re-enable after timeout as fallback
         setTimeout(() => {
-          runButton.disabled = false;
-          runButton.textContent = 'Run Agent';
-        }, 2000);
+          if (isRunning) {
+            isRunning = false;
+            runButton.disabled = false;
+            spinner.style.display = 'none';
+            buttonText.textContent = 'Run Agent';
+          }
+        }, 60000); // 60 second timeout
       } else {
-        alert('Please enter a user story first!');
+        vscode.postMessage({ 
+          command: 'showError', 
+          message: 'Please enter a user story first!' 
+        });
       }
     });
 
-    window.addEventListener('message', event => {
-      const message = event.data;
-      if (message.command === 'log') {
-        const data = message.data;
-        const logBox = document.getElementById('log');
-        
-        // Format the log entry based on status
-        let statusClass = '';
-        if (data.status) {
-          statusClass = `status-${data.status.toLowerCase()}`;
-        }
-        
-        const timestamp = new Date().toLocaleTimeString();
-        const logEntry = `
-          <div class="${statusClass}">
-            <strong>[${timestamp}]</strong> 
-            ${data.message || JSON.stringify(data, null, 2)}
-          </div>
-        `;
-        
-        logBox.innerHTML += logEntry;
-        logBox.scrollTop = logBox.scrollHeight;
+    clearButton.addEventListener('click', () => {
+      const logBox = document.getElementById('log');
+      logBox.innerHTML = `
+        <div class="log-entry">
+          <span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span>
+          <span class="log-agent">🧹 System:</span>
+          <span>Log cleared. Ready for new tasks.</span>
+        </div>
+      `;
+      updateProgress(0);
+      hideAgentInfo();
+      updateStatus('Ready to execute user stories', 'green');
+    });
+
+    // Handle keyboard shortcuts
+    document.getElementById('story').addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter' && !runButton.disabled) {
+        runButton.click();
       }
     });
-  </script>
+
+    // Message handler from extension
+    window.addEventListener('message', event => {
+      const message = event.data;
+      
+      if (message.command === 'log') {
+        const data = message.data;
+        addLogEntry(data);
+        
+        // Handle completion state
+        if (data.status === 'COMPLETED' || data.status === 'ERROR' || data.status === 'CLOSED') {
+          setTimeout(() => {
+            isRunning = false;
+            runButton.disabled = false;
+            spinner.style.display = 'none';
+            buttonText.textContent = 'Run Agent';
+          }, 1000);
+        }
+      } else if (message.command === 'showError') {
+        addLogEntry({ 
+          status: 'ERROR', 
+          message: message.message 
+        });
+      }
+    });
+
+    // Initialize
+    updateStatus('Ready to execute user stories', 'green');
   </script>
 </body>
 </html>
