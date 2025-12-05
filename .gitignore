@@ -1,0 +1,28 @@
+# Base de données SQLite
+solution/database.db
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environnements virtuels Python (au cas où)
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers temporaires
+*.tmp
+*~
+
+# Backup
+*.bak
+backup_*.db
